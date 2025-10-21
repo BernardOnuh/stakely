@@ -1,115 +1,117 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import React, { useState } from 'react';
+import Header from '@/components/layout/Header';
+import Hero from '@/components/hero/Hero';
+import HowItWorks from '@/components/sections/HowItWorks';
+import Features from '@/components/sections/Features';
+import TrustedBy from '@/components/sections/TrustedBy';
+import Footer from '@/components/footer/Footer';
+import WaitlistModal from '@/components/modals/WaitlistModal';
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export default function App() {
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
-export default function Home() {
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a1f] via-[#1a0f3a] to-[#0a0a1f] relative overflow-hidden">
+      {/* ========================================
+          ANIMATED BACKGROUND EFFECTS
+      ======================================== */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Main Central Glow - Massive Purple */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-gradient-radial from-[#7C3AED]/30 via-[#4c1d95]/15 to-transparent blur-3xl animate-pulse-slow"></div>
+        
+        {/* Secondary Glow Layer */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-[#7C3AED]/20 via-[#1a0f3a]/10 to-transparent blur-2xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        
+        {/* Animated Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]"></div>
+        
+        {/* Floating Purple Orbs - Only Purple Theme */}
+        <div className="absolute top-20 left-10 w-80 h-80 bg-[#7C3AED]/15 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#4c1d95]/15 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-[#7C3AED]/10 rounded-full blur-3xl animate-float-slow"></div>
+        <div className="absolute bottom-1/3 left-1/4 w-64 h-64 bg-[#1a0f3a]/20 rounded-full blur-3xl animate-float-slow" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* ========================================
+          MAIN CONTENT SECTIONS
+      ======================================== */}
+      
+      {/* Header */}
+      <Header onPlayNowClick={() => setShowWaitlist(true)} />
+      
+      {/* Hero Section */}
+      <Hero 
+        onGetStartedClick={() => setShowWaitlist(true)}
+        onPlayStakelyClick={() => setShowWaitlist(true)}
+      />
+      
+      {/* How It Works Section */}
+      <HowItWorks />
+      
+      {/* Features Section */}
+      <Features />
+      
+      {/* Trusted By Carousel */}
+      <TrustedBy />
+
+      {/* Footer (includes the epic tagline) */}
+      <Footer />
+
+      {/* ========================================
+          WAITLIST MODAL
+      ======================================== */}
+      <WaitlistModal 
+        isOpen={showWaitlist} 
+        onClose={() => setShowWaitlist(false)} 
+      />
+
+      {/* ========================================
+          GLOBAL STYLES FOR ANIMATIONS
+      ======================================== */}
+      <style jsx global>{`
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.5; }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          50% { transform: translateY(-30px) translateX(10px); }
+        }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          50% { transform: translateY(-15px) translateX(-15px); }
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+          animation: float-delayed 8s ease-in-out infinite;
+          animation-delay: 1s;
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 10s ease-in-out infinite;
+          animation-delay: 2s;
+        }
+        
+        .bg-gradient-radial {
+          background-image: radial-gradient(var(--tw-gradient-stops));
+        }
+      `}</style>
     </div>
   );
 }
