@@ -110,7 +110,7 @@ export default function WaitlistModal({ isOpen, onClose }) {
     try {
       // Prepare data for backend - exact structure you requested
       const waitlistData = {
-        forecasterUsername: socialConnections.farcasterUsername,
+        farcasterUsername: socialConnections.farcasterUsername,
         twitterUsername: socialConnections.twitterUsername,
         email: email.trim()
       };

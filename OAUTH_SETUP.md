@@ -79,7 +79,7 @@ openssl rand -base64 32
 ```javascript
 // Real data sent to backend:
 {
-  "forecasterUsername": "dwr" | null,           // Real FC username
+  "farcasterUsername": "dwr" | null,           // Real FC username
   "twitterUsername": "jack" | null,            // Real Twitter handle  
   "email": "user@example.com"                  // User's email
 }

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { forecasterUsername, twitterUsername, email } = req.body;
+    const { farcasterUsername, twitterUsername, email } = req.body;
     const errors = [];
 
     // Validate required fields
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       errors.push('Email is required');
     }
 
-    if (!forecasterUsername && !twitterUsername) {
+    if (!farcasterUsername && !twitterUsername) {
       errors.push('Either Farcaster username or Twitter username is required');
     }
 
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     const waitlistEntry = {
       id,
       email: normalizedEmail,
-      forecasterUsername: forecasterUsername || null,
+      farcasterUsername: farcasterUsername || null,
       twitterUsername: twitterUsername || null,
       position,
       timestamp: new Date().toISOString(),
