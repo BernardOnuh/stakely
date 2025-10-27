@@ -5,7 +5,7 @@ import React from 'react';
 
 export default function Footer() {
   const socialLinks = [
-    { name: 'X (Twitter)', icon: '𝕏', url: '#' },
+    { name: 'X (Twitter)', icon: '𝕏', url: '' },
     { name: 'Discord', icon: '💬', url: '#' },
     { name: 'Farcaster', icon: '🟣', url: '#' },
     { name: 'Telegram', icon: '✈️', url: '#' }
