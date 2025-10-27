@@ -1,143 +1,45 @@
 // ============================================
 // components/modals/WaitlistModal.jsx - GAMING STYLE
 // ============================================
-import React, { useState, useEffect } from 'react';
-import { socialAuth } from '../../lib/reown';
-import { useSession } from 'next-auth/react';
+import React, { useState } from 'react';
 
 export default function WaitlistModal({ isOpen, onClose }) {
   const [email, setEmail] = useState('');
+  const [twitter, setTwitter] = useState(false);
+  const [farcaster, setFarcaster] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  // Get current session from NextAuth
-  const { data: session, status } = useSession();
-
-  // Track connected social accounts with usernames
-  const [socialConnections, setSocialConnections] = useState({
-    farcasterUsername: null,
-    twitterUsername: null
-  });
-
-  // Update social connections when session changes
-  useEffect(() => {
-    if (session) {
-      if (session.provider === 'twitter') {
-        setSocialConnections(prev => ({
-          ...prev,
-          twitterUsername: session.username,
-          farcasterUsername: null // Clear the other one
-        }));
-      } else if (session.provider === 'farcaster') {
-        setSocialConnections(prev => ({
-          ...prev,
-          farcasterUsername: session.username,
-          twitterUsername: null // Clear the other one
-        }));
-      }
-    } else {
-      // No session, clear connections
-      setSocialConnections({
-        farcasterUsername: null,
-        twitterUsername: null
-      });
-    }
-  }, [session]);
-
-  const handleSocialConnect = async (platform) => {
+  const handleTwitterConnect = () => {
+    setTwitter(!twitter);
     setError('');
-    setLoading(true);
-
-    try {
-      let result;
-      
-      if (platform === 'twitter') {
-        result = await socialAuth.connectTwitter();
-      } else if (platform === 'farcaster') {
-        result = await socialAuth.connectFarcaster();
-      }
-
-      if (!result.success) {
-        throw new Error(result.error || `Failed to connect to ${platform}`);
-      }
-
-      // The useEffect will handle updating the state when session changes
-      console.log(`✅ ${platform} connected successfully`);
-      
-    } catch (error) {
-      console.error(`❌ ${platform} connection failed:`, error);
-      setError(`❌ Failed to connect to ${platform}. Please try again.`);
-    } finally {
-      setLoading(false);
-    }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await socialAuth.disconnect();
-      setSocialConnections({
-        farcasterUsername: null,
-        twitterUsername: null
-      });
-    } catch (error) {
-      console.error('❌ Disconnect failed:', error);
-      setError('❌ Failed to disconnect. Please try again.');
-    }
+  const handleFarcasterConnect = () => {
+    setFarcaster(!farcaster);
+    setError('');
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!email) {
       setError('⚠️ Email required to get notified!');
       return;
     }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('⚠️ Please enter a valid email address!');
-      return;
-    }
     
-    if (!socialConnections.farcasterUsername && !socialConnections.twitterUsername) {
+    if (!twitter && !farcaster) {
       setError('⚠️ Connect at least one social account!');
       return;
     }
 
-    setLoading(true);
-    setError('');
+    // Send to backend
+    console.log({
+      email,
+      twitter,
+      farcaster,
+      timestamp: new Date().toISOString()
+    });
 
-    try {
-      // Prepare data for backend - exact structure you requested
-      const waitlistData = {
-        farcasterUsername: socialConnections.farcasterUsername,
-        twitterUsername: socialConnections.twitterUsername,
-        email: email.trim()
-      };
-
-      // Send to backend API
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(waitlistData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('Waitlist submission successful:', result);
-      
-      setSubmitted(true);
-    } catch (error) {
-      console.error('Failed to submit to waitlist:', error);
-      setError('⚠️ Failed to join waitlist. Please try again!');
-    } finally {
-      setLoading(false);
-    }
+    setSubmitted(true);
   };
 
   const handleClose = () => {
@@ -145,8 +47,9 @@ export default function WaitlistModal({ isOpen, onClose }) {
     setTimeout(() => {
       setSubmitted(false);
       setEmail('');
+      setTwitter(false);
+      setFarcaster(false);
       setError('');
-      // Don't reset social connections - they persist across modal opens
     }, 300);
   };
 
@@ -205,20 +108,20 @@ export default function WaitlistModal({ isOpen, onClose }) {
                 <div className="bg-black/40 border-2 border-[#7C3AED]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
                   <p className="text-gray-400 text-sm mb-4 uppercase tracking-wider font-bold">Connected</p>
                   <div className="flex gap-3 justify-center flex-wrap">
-                    {socialConnections.twitterUsername && (
+                    {twitter && (
                       <div className="flex items-center gap-2 bg-[#7C3AED]/20 text-white px-5 py-3 rounded-xl border-2 border-[#7C3AED]/40 backdrop-blur-sm">
                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                         </svg>
-                        <span className="font-black uppercase text-sm" style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}>@{socialConnections.twitterUsername} ✓</span>
+                        <span className="font-black uppercase text-sm" style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}>Twitter ✓</span>
                       </div>
                     )}
-                    {socialConnections.farcasterUsername && (
+                    {farcaster && (
                       <div className="flex items-center gap-2 bg-[#7C3AED]/20 text-white px-5 py-3 rounded-xl border-2 border-[#7C3AED]/40 backdrop-blur-sm">
                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
                         </svg>
-                        <span className="font-black uppercase text-sm" style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}>@{socialConnections.farcasterUsername} ✓</span>
+                        <span className="font-black uppercase text-sm" style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}>Farcaster ✓</span>
                       </div>
                     )}
                   </div>
@@ -284,7 +187,7 @@ export default function WaitlistModal({ isOpen, onClose }) {
                 {/* Instructions */}
                 <div className="bg-[#7C3AED]/10 border-2 border-[#7C3AED]/30 rounded-xl p-4 mb-6 backdrop-blur-sm">
                   <p className="text-white text-sm font-bold text-center">
-                    ⚡ Connect <span className="text-[#7C3AED]">Twitter</span> or <span className="text-[#7C3AED]">Farcaster</span> (choose one) + Email
+                    ⚡ Connect <span className="text-[#7C3AED]">Twitter</span> or <span className="text-[#7C3AED]">Farcaster</span> (or both!) + Email
                   </p>
                 </div>
 
@@ -292,45 +195,43 @@ export default function WaitlistModal({ isOpen, onClose }) {
                 <div className="space-y-4 mb-6">
                   <button
                     type="button"
-                    onClick={() => handleSocialConnect('twitter')}
-                    disabled={loading}
-                    className={`group relative w-full py-4 px-6 rounded-xl font-black uppercase tracking-wider transition-all flex items-center justify-center gap-3 border-2 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed ${
-                      socialConnections.twitterUsername 
+                    onClick={handleTwitterConnect}
+                    className={`group relative w-full py-4 px-6 rounded-xl font-black uppercase tracking-wider transition-all flex items-center justify-center gap-3 border-2 overflow-hidden ${
+                      twitter 
                         ? 'bg-gradient-to-r from-[#7C3AED] to-[#4c1d95] text-white border-[#7C3AED] shadow-lg shadow-purple-500/40' 
                         : 'bg-black/40 text-gray-300 border-[#7C3AED]/30 hover:border-[#7C3AED] hover:bg-[#7C3AED]/10'
                     }`}
                     style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}
                   >
                     {/* Background Effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-r from-[#7C3AED]/0 via-[#7C3AED]/20 to-[#7C3AED]/0 transform ${socialConnections.twitterUsername ? 'translate-x-full' : '-translate-x-full'} group-hover:translate-x-full transition-transform duration-1000`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-r from-[#7C3AED]/0 via-[#7C3AED]/20 to-[#7C3AED]/0 transform ${twitter ? 'translate-x-full' : '-translate-x-full'} group-hover:translate-x-full transition-transform duration-1000`}></div>
                     
                     <svg className="relative w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                     </svg>
                     <span className="relative text-lg">
-                      {socialConnections.twitterUsername ? `✓ @${socialConnections.twitterUsername}` : 'Connect Twitter (X)'}
+                      {twitter ? '✓ Twitter Connected' : 'Connect Twitter (X)'}
                     </span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handleSocialConnect('farcaster')}
-                    disabled={loading}
-                    className={`group relative w-full py-4 px-6 rounded-xl font-black uppercase tracking-wider transition-all flex items-center justify-center gap-3 border-2 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed ${
-                      socialConnections.farcasterUsername 
+                    onClick={handleFarcasterConnect}
+                    className={`group relative w-full py-4 px-6 rounded-xl font-black uppercase tracking-wider transition-all flex items-center justify-center gap-3 border-2 overflow-hidden ${
+                      farcaster 
                         ? 'bg-gradient-to-r from-[#7C3AED] to-[#4c1d95] text-white border-[#7C3AED] shadow-lg shadow-purple-500/40' 
                         : 'bg-black/40 text-gray-300 border-[#7C3AED]/30 hover:border-[#7C3AED] hover:bg-[#7C3AED]/10'
                     }`}
                     style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}
                   >
                     {/* Background Effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-r from-[#7C3AED]/0 via-[#7C3AED]/20 to-[#7C3AED]/0 transform ${socialConnections.farcasterUsername ? 'translate-x-full' : '-translate-x-full'} group-hover:translate-x-full transition-transform duration-1000`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-r from-[#7C3AED]/0 via-[#7C3AED]/20 to-[#7C3AED]/0 transform ${farcaster ? 'translate-x-full' : '-translate-x-full'} group-hover:translate-x-full transition-transform duration-1000`}></div>
                     
                     <svg className="relative w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
                     </svg>
                     <span className="relative text-lg">
-                      {socialConnections.farcasterUsername ? `✓ @${socialConnections.farcasterUsername}` : 'Connect Farcaster'}
+                      {farcaster ? '✓ Farcaster Connected' : 'Connect Farcaster'}
                     </span>
                   </button>
                 </div>
@@ -369,27 +270,14 @@ export default function WaitlistModal({ isOpen, onClose }) {
                 {/* Submit Button */}
                 <button
                   onClick={handleSubmit}
-                  disabled={loading}
-                  className="group relative w-full py-5 px-6 bg-gradient-to-r from-[#7C3AED] to-[#4c1d95] text-white font-black uppercase tracking-wider rounded-xl transition-all shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:scale-105 border-2 border-white/20 overflow-hidden text-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="group relative w-full py-5 px-6 bg-gradient-to-r from-[#7C3AED] to-[#4c1d95] text-white font-black uppercase tracking-wider rounded-xl transition-all shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:scale-105 border-2 border-white/20 overflow-hidden text-xl"
                   style={{ fontFamily: '"Bebas Neue", "Impact", sans-serif' }}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
-                    {loading ? (
-                      <>
-                        <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Joining...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                        </svg>
-                        Join Waitlist
-                      </>
-                    )}
+                    <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                    </svg>
+                    Join Waitlist
                   </span>
                   
                   {/* Shine Effect */}
@@ -411,4 +299,3 @@ export default function WaitlistModal({ isOpen, onClose }) {
     </div>
   );
 }
-
